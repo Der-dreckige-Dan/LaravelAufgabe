@@ -19,4 +19,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 RUN chown -R www-data:www-data /var/www/html/
 
+USER www-data
+
 ENTRYPOINT ["entrypoint.sh"]
