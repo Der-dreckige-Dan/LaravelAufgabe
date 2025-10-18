@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use ApiPlatform\Metadata\ApiResource;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Aufgabe extends Model {
 
@@ -16,4 +16,8 @@ class Aufgabe extends Model {
     protected string $description;
 
     protected int $status;
+
+    public function users(): BelongsToMany {
+        return $this->belongsToMany(User::class);
+    }
 }
