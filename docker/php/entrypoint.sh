@@ -9,6 +9,12 @@ done
 
 echo "Database is up - continuing..."
 
+composer dump-autoload --optimize
+
+php artisan api-platform:install
+
+php artisan install:api
+
 # Migrationen ausführen
 php artisan migrate --force
 

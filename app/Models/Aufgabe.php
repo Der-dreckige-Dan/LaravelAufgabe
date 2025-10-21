@@ -2,10 +2,17 @@
 
 namespace App\Models;
 
+use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
+use App\Enums\AufgabenStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ApiResource]
 class Aufgabe extends Model {
+
+    use HasFactory;
 
     protected $table = 'aufgaben';
 
@@ -15,9 +22,12 @@ class Aufgabe extends Model {
 
     protected string $description;
 
-    protected int $status;
+    #[ApiProperty(types: AufgabenStatus::class)]
+    protected AufgabenStatus $status;
 
-    public function users(): BelongsToMany {
-        return $this->belongsToMany(User::class);
+    protected function casts(): array {
+        return [
+            'status' => AufgabenStatus::class,
+        ];
     }
 }
