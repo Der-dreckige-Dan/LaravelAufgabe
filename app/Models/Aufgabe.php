@@ -11,8 +11,11 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Enums\AufgabenStatus;
+use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use SebastianBergmann\CodeCoverage\Report\Xml\Project;
 
 #[ApiResource(
     operations: [
@@ -32,11 +35,13 @@ class Aufgabe extends Model {
 
     public $timestamps = false;
 
-    protected $fillable = ['title', 'description', 'status'];
+    protected $fillable = ['title', 'description', 'status', 'deadline'];
 
     protected string $title;
 
     protected string $description;
+
+    protected DateTimeImmutable $deadline;
 
     #[ApiProperty(types: AufgabenStatus::class)]
     protected AufgabenStatus $status;
@@ -45,5 +50,13 @@ class Aufgabe extends Model {
         return [
             'status' => AufgabenStatus::class,
         ];
+    }
+
+    public function benutzer(): BelongsTo {
+        return $this->belongsTo(User::class);
+    }
+
+    public function projekt(): BelongsTo {
+        return $this->belongsTo(Project::class);
     }
 }
