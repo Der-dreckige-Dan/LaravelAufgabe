@@ -31,13 +31,14 @@ return [
 
     'resources' => [
         app_path('Models'),
+        app_path('Dto'),
     ],
 
     'formats' => [
         'json' => ['application/json'],
         'jsonld' => ['application/ld+json'],
-        // 'jsonapi' => ['application/vnd.api+json'],
-         'csv' => ['text/csv'],
+        'jsonapi' => ['application/vnd.api+json'],
+        'csv' => ['text/csv'],
     ],
 
     'patch_formats' => [
@@ -65,7 +66,6 @@ return [
         'pagination_items_per_page' => 30,
         'pagination_maximum_items_per_page' => 30,
         'route_prefix' => '/api',
-        'middleware' => 'auth:sanctum',
     ],
 
     'pagination' => [
@@ -100,12 +100,12 @@ return [
 
     'swagger_ui' => [
         'enabled' => true,
-         'apiKeys' => [
-             'api' => [
-                 'name' => 'Authorization',
-                 'type' => 'header',
-             ],
-         ],
+        'apiKeys' => [
+            'api' => [
+                'name' => 'Authorization',
+                'type' => 'header',
+            ],
+        ],
         // 'oauth' => [
         //     'enabled' => true,
         //     'type' => 'oauth2',

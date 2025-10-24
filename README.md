@@ -3,4 +3,5 @@ docker compose up -d --build
 
 Danach sollte alles funktionieren.
 
-Das Projekt wurde mit API Platform erstellt. Die API Dokumentation ist einfach erreichbar unter http://localhost/api
+Das Projekt wurde mit API Platform erstellt.
+Die API Dokumentation ist einfach erreichbar unter http://localhost/api

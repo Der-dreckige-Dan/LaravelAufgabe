@@ -1,10 +1,12 @@
 <?php
 
-use App\Http\Middleware\EnsureAuth;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return redirect('/api');
+});
 
 
 Route::get('/logout', function (Request $request) {
