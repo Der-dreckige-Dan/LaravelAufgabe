@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
+use App\Http\Middleware\EnsureAuth;
 use App\State\TokenCreatorProvider;
 
 #[ApiResource(
@@ -16,7 +17,7 @@ use App\State\TokenCreatorProvider;
                 description: "Hier kann man einen API Token holen für die restlichen Routen."
             ),
             provider: TokenCreatorProvider::class,
-            middleware: 'auth.basic'
+            middleware: EnsureAuth::class
         )
     ],
     routePrefix: '',
