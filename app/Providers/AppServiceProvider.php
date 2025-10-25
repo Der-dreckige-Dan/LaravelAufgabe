@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\State\TokenCreatorProvider;
-use ApiPlatform\State\ProviderInterface;
+use App\Models\Aufgabe;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider {
@@ -18,6 +18,6 @@ class AppServiceProvider extends ServiceProvider {
      * Bootstrap any application services.
      */
     public function boot(): void {
-        $this->app->tag(TokenCreatorProvider::class, ProviderInterface::class);
+        Route::model('aufgaben', Aufgabe::class);
     }
 }
