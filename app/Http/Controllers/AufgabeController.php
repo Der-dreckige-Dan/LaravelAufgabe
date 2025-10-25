@@ -3,48 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aufgabe;
+use App\Models\Projekt;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AufgabeController extends Controller {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index() {
         return response()->json(Aufgabe::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request) {
         try {
             $aufgabe = Aufgabe::create($request->all());
-        } catch (\Throwable){
+        } catch (\Throwable $th) {
             return response()->json(null, 400);
         }
         return response()->json($aufgabe, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Aufgabe $aufgabe) {
         return response()->json($aufgabe);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Aufgabe $aufgabe) {
         $aufgabe->update($request->all());
         return response()->json($aufgabe);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Aufgabe $aufgabe) {
         $aufgabe->delete();
         return response()->json(null, 204);
+    }
+
+    public function getAufgabenFromBenutzer(User $user) {
+        return response()->json($user->aufgaben()->get());
+    }
+
+    public function getAufgabenFromProjekt(Projekt $projekt) {
+        return response()->json($projekt->aufgaben()->get());
+    }
+
+    public function updateDeadline(Request $request, Aufgabe $aufgabe) {
+        $aufgabe->deadline = $request->deadline;
+        return response()->json($aufgabe);
+    }
+
+    public function getOverdue() {
+        $aufgaben = Aufgabe::where('deadline', '<', now()->toDateTimeString())->get();
+        return response()->json($aufgaben);
     }
 }

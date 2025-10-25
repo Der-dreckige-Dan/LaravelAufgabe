@@ -11,6 +11,8 @@ class Benutzer extends Model
     /** @use HasFactory<\Database\Factories\BenutzerFactory> */
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $table = 'benutzer';
 
     public function aufgaben():HasMany {

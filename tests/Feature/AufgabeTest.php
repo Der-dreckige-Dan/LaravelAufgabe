@@ -48,6 +48,9 @@ class AufgabeTest extends TestCase {
             'title' => 'Test aufgabe',
             'description' => 'Test aufgabe',
             'status' => 1,
+            'deadline'=> now()->toDateTimeString(),
+            'user_id' => 1,
+            'projekt_id' => 2,
         ];
         $response = $this->jsonRoute('POST', 'aufgaben.store', $inputArray);
         $response->assertStatus(201);

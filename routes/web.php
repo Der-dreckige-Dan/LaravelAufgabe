@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AufgabeController;
 use App\Http\Middleware\EnsureAuth;
+use App\Http\Middleware\EnsureAuthorizedDeadline;
+use App\Http\Middleware\EnsureOwnAufgabe;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,9 +25,16 @@ Route::middleware(EnsureAuth::class)->group(function () {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/api');
+        return redirect('/');
     })->name('logout');
 });
+Route::get('/aufgaben/overdue', [AufgabeController::class, 'getOverdue'])->name('aufgabe.overdue');
 
-//Route::resource('aufgabe', AufgabeController::class)->middleware('auth:sanctum');
-Route::apiResource('aufgaben', AufgabeController::class)->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('aufgaben', AufgabeController::class)
+    ->middlewareFor(['update'],[EnsureOwnAufgabe::class, EnsureAuthorizedDeadline::class]);
+    Route::get('/user/aufgaben/{user}', [AufgabeController::class, 'getAufgabenFromBenutzer'])->name('benutzer.aufgaben');
+    Route::get('/projekte/aufgaben/{projekt}', [AufgabeController::class, 'getAufgabenFromProjekt'])->name('projekte.aufgaben');
+    Route::patch('/aufgaben/updateDeadline/{aufgabe}', [AufgabeController::class, 'updateDeadline'])->name('aufgaben.updateDeadline');
+});
+

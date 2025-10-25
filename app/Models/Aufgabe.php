@@ -16,7 +16,7 @@ class Aufgabe extends Model {
 
     public $timestamps = false;
 
-    protected $fillable = ['title', 'description', 'status', 'deadline'];
+    protected $fillable = ['title', 'description', 'status', 'deadline', 'user_id', 'projekt_id'];
 
     protected string $title;
 
@@ -32,11 +32,11 @@ class Aufgabe extends Model {
         ];
     }
 
-    public function benutzer(): BelongsTo {
+    public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
 
     public function projekt(): BelongsTo {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Projekt::class);
     }
 }
