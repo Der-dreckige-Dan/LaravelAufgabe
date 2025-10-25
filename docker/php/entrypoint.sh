@@ -13,10 +13,6 @@ composer dump-autoload --optimize
 
 php artisan key:generate
 
-php artisan api-platform:install
-
-php artisan install:api
-
 # Migrationen ausführen
 php artisan migrate --force
 

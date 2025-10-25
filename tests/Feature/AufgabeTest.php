@@ -2,17 +2,17 @@
 
 namespace Feature;
 
-use ApiPlatform\Laravel\Test\ApiTestAssertionsTrait;
 use App\Models\Aufgabe;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\Depends;
 use Tests\TestCase;
 
 class AufgabeTest extends TestCase {
 
-    use RefreshDatabase, ApiTestAssertionsTrait;
+    use RefreshDatabase;
 
     protected string $token;
 
@@ -20,73 +20,69 @@ class AufgabeTest extends TestCase {
         parent::setUp();
         $this->seed();
         $response = $this->withBasicAuth('test', '1234')
-            ->getJson('/user/token/1');
+            ->jsonRoute('GET', 'token.create', apiHeaders: false);
         $response->assertStatus(200);
-        $this->token = $response->json('token');
+        $this->token = $response->json();
+    }
+
+    private function jsonRoute(string $method, string $name, array $data = [], array $headers = [], bool $apiHeaders = true, array $routeParams = []): TestResponse {
+        if ($apiHeaders) {
+            $headers = [
+                'Authorization' => $this->token,
+                'Accept' => 'application/json',
+                ...$headers
+            ];
+        }
+        return $this->json($method, route($name, $routeParams), $data, $headers);
     }
 
     public function testGetCollection(): void {
-        $response = $this->getJson('/api/aufgaben', [
-            'Authorization' => $this->token,
-            'Accept' => 'application/json',
-        ]);
+        $response = $this->jsonRoute('GET', 'aufgaben.index');
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/json; charset=utf-8');
+        $response->assertHeader('Content-Type', 'application/json');
         $this->assertCount(10, $response->json());
     }
 
     public function testCreateAufgabe(): void {
-        $response = $this->postJson('/api/aufgaben', [
+        $inputArray = [
             'title' => 'Test aufgabe',
             'description' => 'Test aufgabe',
-            'status' => '1',
-        ], [
-            'Authorization' => $this->token,
-            'Accept' => 'application/json',
-        ]);
+            'status' => 1,
+        ];
+        $response = $this->jsonRoute('POST', 'aufgaben.store', $inputArray);
         $response->assertStatus(201);
+        $this->assertArrayIsEqualToArrayIgnoringListOfKeys($inputArray, $response->json(), ['id']);
     }
 
     public function testCreateInvalidAufgabe() {
-        $response = $this->postJson('/api/aufgaben', [
-            'title' => 'Test aufgabe',
-            'description' => 'Test aufgabe',
-            'status' => '1',
-        ], [
-            'Authorization' => $this->token,
-            'Accept' => 'application/json',
-        ]);
-        $response->assertStatus(422);
+        $inputArray = [
+            'title' => '',
+        ];
+        $response = $this->jsonRoute('POST', 'aufgaben.store', $inputArray);
+        $response->assertStatus(400);
     }
 
     public function testUpdateAufgabe(): void {
         $aufgabe = Aufgabe::factory()->create([
             'title' => 'Test aufgabe',
             'description' => 'Test aufgabe',
-            'status' => '1',
+            'status' => 1,
         ]);
-        $response = $this->putJson($this->getIriFromResource($aufgabe), [
-            'status' => '2',
-        ], [
-            'Authorization' => $this->token,
-            'Accept' => 'application/json',
-        ]);
+        $inputArray = [
+            'status' => 2,
+        ];
+        $response = $this->jsonRoute('PATCH', 'aufgaben.update', $inputArray, routeParams: ['aufgaben' => $aufgabe->id]);
         $response->assertStatus(200);
-        $this->assertJsonContains([
-            'status' => '2'
-        ], $response->json());
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $response->json(), ['status']);
     }
 
     public function testDeleteAufgabe(): void {
         $aufgabe = Aufgabe::factory()->create([
             'title' => 'Test aufgabe',
             'description' => 'Test aufgabe',
-            'status' => '1',
+            'status' => 1,
         ]);
-        $response = $this->deleteJson($this->getIriFromResource($aufgabe), [
-            'Authorization' => $this->token,
-            'Accept' => 'application/json',
-        ]);
+        $response = $this->jsonRoute('DELETE', 'aufgaben.destroy', routeParams: ['aufgaben' => $aufgabe->id]);
         $response->assertStatus(204);
         $this->assertDatabaseMissing('aufgaben', ['id' => $aufgabe->id]);
     }
