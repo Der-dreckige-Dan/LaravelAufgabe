@@ -16,11 +16,11 @@ class AufgabeController extends Controller {
 
     public function store(Request $request) {
         try {
-            /** @var Aufgabe $aufgabe */
-            $aufgabe = Aufgabe::create($request->all());
-            if (empty($aufgabe->user)) {
-                $aufgabe->user()->associate($request->user());
+            $requestArr = $request->all();
+            if (empty($request['user_id'])) {
+                $requestArr['user_id'] = $request->user()->id;
             }
+            $aufgabe = Aufgabe::create($requestArr);
         } catch (\Throwable $th) {
             return response()->json($th, 400);
         }

@@ -36,11 +36,18 @@ class AufgabeTest extends TestCase {
         return $this->json($method, route($name, $routeParams), $data, $headers);
     }
 
+    private function getResponse(TestResponse $response): mixed {
+        if (!empty($response->json('data'))) {
+            return $response->json('data');
+        }
+        return $response->json();
+    }
+
     public function testGetCollection(): void {
         $response = $this->jsonRoute('GET', 'aufgaben.index');
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/json');
-        $this->assertCount(10, $response->json());
+        $this->assertCount(10, $this->getResponse($response));
     }
 
     public function testCreateAufgabe(): void {
@@ -48,13 +55,13 @@ class AufgabeTest extends TestCase {
             'title' => 'Test aufgabe',
             'description' => 'Test aufgabe',
             'status' => 1,
-            'deadline'=> now()->toDateTimeString(),
+            'deadline' => now()->toDateTimeString(),
             'user_id' => 1,
             'projekt_id' => 2,
         ];
         $response = $this->jsonRoute('POST', 'aufgaben.store', $inputArray);
         $response->assertStatus(201);
-        $this->assertArrayIsEqualToArrayIgnoringListOfKeys($inputArray, $response->json(), ['id']);
+        $this->assertArrayIsEqualToArrayIgnoringListOfKeys($inputArray, $this->getResponse($response), ['id']);
     }
 
     public function testCreateInvalidAufgabe() {
@@ -78,7 +85,7 @@ class AufgabeTest extends TestCase {
         ];
         $response = $this->jsonRoute('PATCH', 'aufgaben.update', $inputArray, routeParams: ['aufgaben' => $aufgabe->id]);
         $response->assertStatus(200);
-        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $response->json(), ['status']);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getResponse($response), ['status']);
     }
 
     public function testDeleteAufgabe(): void {

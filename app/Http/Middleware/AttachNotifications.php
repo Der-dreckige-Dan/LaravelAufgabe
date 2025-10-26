@@ -20,8 +20,10 @@ class AttachNotifications {
             $notifications[] = $notification->data['message'];
             $notification->markAsRead();
         }
-        $content = sprintf("{\"notifications\":%s, \"data\":%s}", json_encode($notifications), $content);
-        $response->setContent($content);
+        if (!empty($notifications)) {
+            $content = sprintf("{\"notifications\":%s, \"data\":%s}", json_encode($notifications), $content);
+            $response->setContent($content);
+        }
         return $response;
     }
 }
