@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AufgabeUpdated;
 use App\Models\Aufgabe;
 use App\Models\Projekt;
 use App\Models\User;
@@ -15,9 +16,13 @@ class AufgabeController extends Controller {
 
     public function store(Request $request) {
         try {
+            /** @var Aufgabe $aufgabe */
             $aufgabe = Aufgabe::create($request->all());
+            if (empty($aufgabe->user)) {
+                $aufgabe->user()->associate($request->user());
+            }
         } catch (\Throwable $th) {
-            return response()->json(null, 400);
+            return response()->json($th, 400);
         }
         return response()->json($aufgabe, 201);
     }
@@ -28,6 +33,7 @@ class AufgabeController extends Controller {
 
     public function update(Request $request, Aufgabe $aufgabe) {
         $aufgabe->update($request->all());
+        AufgabeUpdated::dispatch($aufgabe);
         return response()->json($aufgabe);
     }
 

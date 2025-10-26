@@ -13,9 +13,13 @@ class EnsureOwnAufgabe {
      *
      * @param \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response) $next
      */
-    public function handle(Request $request, Closure $next, Aufgabe $aufgabe): Response {
-        if ($aufgabe->user()->get()->id === $request->user()->id) {
-            return response()->json(null, Response::HTTP_UNAUTHORIZED);
+    public function handle(Request $request, Closure $next): Response {
+        /** @var Aufgabe $aufgabe */
+        $aufgabe = $request->route('aufgaben');
+        if ($aufgabe->deadline < now()->toDateTimeString()) {
+            if ($aufgabe?->user?->id !== $request?->user()?->id) {
+                return response()->json(null, Response::HTTP_UNAUTHORIZED);
+            }
         }
         return $next($request);
     }
