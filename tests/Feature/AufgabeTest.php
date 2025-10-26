@@ -98,4 +98,34 @@ class AufgabeTest extends TestCase {
         $response->assertStatus(204);
         $this->assertDatabaseMissing('aufgaben', ['id' => $aufgabe->id]);
     }
+
+    public function testUserAufgaben(): void {
+        $response = $this->jsonRoute('GET', 'user.aufgaben', routeParams: ['user' => 1]);
+        $response->assertStatus(200);
+    }
+
+    public function testProjektAufgaben(): void {
+        $response = $this->jsonRoute('GET', 'projekte.aufgaben', routeParams: ['projekt' => 1]);
+        $response->assertStatus(200);
+    }
+
+    public function testAufgabenOverdue(): void {
+        $response = $this->jsonRoute('GET', 'aufgaben.overdue');
+        $response->assertStatus(200);
+    }
+
+    public function testUpdateDeadline(): void {
+        $aufgabe = Aufgabe::factory()->create([
+            'title' => 'Test aufgabe',
+            'description' => 'Test aufgabe',
+            'status' => 1,
+            'user_id' => 1,
+        ]);
+        $inputArray = [
+            'deadline' => now()->toDateTimeString(),
+        ];
+        $response = $this->jsonRoute('PATCH', 'aufgaben.update', $inputArray, routeParams: ['aufgaben' => $aufgabe->id]);
+        $response->assertStatus(200);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getResponse($response), ['deadline']);
+    }
 }

@@ -17,10 +17,9 @@ Route::get('/token/create', function (Request $request) {
 })->name('token.create')->middleware(EnsureAuth::class);
 
 Route::middleware(['auth:sanctum', AttachNotifications::class])->group(function () {
+    Route::get('/aufgaben/overdue', [AufgabeController::class, 'getOverdue'])->name('aufgaben.overdue');
     Route::apiResource('aufgaben', AufgabeController::class)
         ->middlewareFor(['update'], [EnsureOwnAufgabe::class]);
     Route::get('/user/{user}/aufgaben', [AufgabeController::class, 'getAufgabenFromBenutzer'])->name('user.aufgaben');
     Route::get('/projekte/{projekt}/aufgaben', [AufgabeController::class, 'getAufgabenFromProjekt'])->name('projekte.aufgaben');
-    Route::get('/aufgaben/overdue', [AufgabeController::class, 'getOverdue'])->name('aufgaben.overdue');
-    Route::patch('/aufgaben/updateDeadline/{aufgabe}', [AufgabeController::class, 'updateDeadline'])->name('aufgaben.updateDeadline');
 });

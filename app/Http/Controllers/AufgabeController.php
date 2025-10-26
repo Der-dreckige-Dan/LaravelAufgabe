@@ -50,11 +50,6 @@ class AufgabeController extends Controller {
         return response()->json($projekt->aufgaben()->get());
     }
 
-    public function updateDeadline(Request $request, Aufgabe $aufgabe) {
-        $aufgabe->deadline = $request->deadline;
-        return response()->json($aufgabe);
-    }
-
     public function getOverdue() {
         $aufgaben = Aufgabe::where('deadline', '<', now()->toDateTimeString())->get();
         return response()->json($aufgaben);
