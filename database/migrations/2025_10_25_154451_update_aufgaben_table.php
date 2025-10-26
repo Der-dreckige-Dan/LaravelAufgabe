@@ -12,7 +12,7 @@ return new class extends Migration {
      */
     public function up(): void {
         Schema::table('aufgaben', function (Blueprint $table) {
-            $table->dateTime('deadline');
+            $table->dateTime('deadline')->nullable();
             $table->foreignIdFor(User::class)->nullable();
             $table->foreignIdFor(Projekt::class)->nullable();
         });

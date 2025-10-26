@@ -36,7 +36,7 @@ class AufgabeTest extends TestCase {
         return $this->json($method, route($name, $routeParams), $data, $headers);
     }
 
-    private function getResponse(TestResponse $response): mixed {
+    private function getJsonFromResponse(TestResponse $response): mixed {
         if (!empty($response->json('data'))) {
             return $response->json('data');
         }
@@ -47,7 +47,7 @@ class AufgabeTest extends TestCase {
         $response = $this->jsonRoute('GET', 'aufgaben.index');
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/json');
-        $this->assertCount(10, $this->getResponse($response));
+        $this->assertCount(10, $this->getJsonFromResponse($response));
     }
 
     public function testCreateAufgabe(): void {
@@ -61,7 +61,7 @@ class AufgabeTest extends TestCase {
         ];
         $response = $this->jsonRoute('POST', 'aufgaben.store', $inputArray);
         $response->assertStatus(201);
-        $this->assertArrayIsEqualToArrayIgnoringListOfKeys($inputArray, $this->getResponse($response), ['id']);
+        $this->assertArrayIsEqualToArrayIgnoringListOfKeys($inputArray, $this->getJsonFromResponse($response), ['id']);
     }
 
     public function testCreateInvalidAufgabe() {
@@ -85,7 +85,7 @@ class AufgabeTest extends TestCase {
         ];
         $response = $this->jsonRoute('PATCH', 'aufgaben.update', $inputArray, routeParams: ['aufgaben' => $aufgabe->id]);
         $response->assertStatus(200);
-        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getResponse($response), ['status']);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getJsonFromResponse($response), ['status']);
     }
 
     public function testDeleteAufgabe(): void {
@@ -100,13 +100,22 @@ class AufgabeTest extends TestCase {
     }
 
     public function testUserAufgaben(): void {
+        Aufgabe::factory()->create([
+            'user_id' => 1
+        ]);
         $response = $this->jsonRoute('GET', 'user.aufgaben', routeParams: ['user' => 1]);
         $response->assertStatus(200);
+        $this->assertNotEmpty($this->getJsonFromResponse($response));
+
     }
 
     public function testProjektAufgaben(): void {
+        Aufgabe::factory()->create([
+            'projekt_id' => 1
+        ]);
         $response = $this->jsonRoute('GET', 'projekte.aufgaben', routeParams: ['projekt' => 1]);
         $response->assertStatus(200);
+        $this->assertNotEmpty($this->getJsonFromResponse($response));
     }
 
     public function testAufgabenOverdue(): void {
@@ -126,6 +135,16 @@ class AufgabeTest extends TestCase {
         ];
         $response = $this->jsonRoute('PATCH', 'aufgaben.update', $inputArray, routeParams: ['aufgaben' => $aufgabe->id]);
         $response->assertStatus(200);
-        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getResponse($response), ['deadline']);
+        $this->assertArrayIsEqualToArrayOnlyConsideringListOfKeys($inputArray, $this->getJsonFromResponse($response), ['deadline']);
+    }
+
+    public function testNotification() {
+        $aufgabe = Aufgabe::factory()->create([
+            'user_id' => 1,
+        ]);
+        $response = $this->jsonRoute('PUT', 'aufgaben.update', routeParams: ['aufgaben' => $aufgabe->id]);
+        $response->assertStatus(200);
+        $this->assertArrayHasKey('notifications', $response->json());
+        $this->assertNotEmpty($response->json()['notifications']);
     }
 }

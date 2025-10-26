@@ -11,12 +11,8 @@ echo "Database is up - continuing..."
 
 composer dump-autoload --optimize
 
-php artisan make:notifications-table
-
 php artisan key:generate
 
-# Migrationen ausführen
 php artisan migrate --force
 
-# PHP-FPM starten
 php-fpm
