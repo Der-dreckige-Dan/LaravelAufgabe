@@ -1,0 +1,59 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+        container_name: laravel-app
+        volumes:
+            - ./app:/var/www/html/app
+            - ./routes:/var/www/html/routes
+            - ./resources:/var/www/html/resources
+            - ./database:/var/www/html/database
+            - ./public:/var/www/html/public
+            - ./config:/var/www/html/config
+            - ./tests:/var/www/html/tests
+        depends_on:
+            - db
+        networks:
+            - laravel
+
+    web:
+        image: nginx:stable-alpine
+        container_name: laravel-web
+        ports:
+            - "80:80"
+        volumes:
+            - ./app:/var/www/html/app
+            - ./routes:/var/www/html/routes
+            - ./resources:/var/www/html/resources
+            - ./database:/var/www/html/database
+            - ./public:/var/www/html/public
+            - ./config:/var/www/html/config
+            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./tests:/var/www/html/tests
+        depends_on:
+            - app
+        networks:
+            - laravel
+
+    db:
+        image: mysql:8.0
+        container_name: laravel-db
+        restart: always
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - db_data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        networks:
+            - laravel
+
+networks:
+    laravel:
+
+volumes:
+    db_data:
